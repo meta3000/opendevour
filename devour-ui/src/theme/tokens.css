@@ -1,0 +1,205 @@
+/* =============================================
+ * AlphaAgent Design Tokens
+ * CSS Custom Properties — 全局设计变量
+ * 严格遵循 01-design-system.md 规范
+ * ============================================= */
+
+:root {
+  /* ---- 背景层级 ---- */
+  --color-bg-base:        #0F1117;   /* 页面底色 */
+  --color-bg-surface:     #171B26;   /* 卡片/面板 */
+  --color-bg-elevated:    #1E2335;   /* 悬停/选中行/Tooltip */
+  --color-bg-overlay:     #252A3D;   /* 模态框/下拉菜单 */
+
+  /* ---- 边框 ---- */
+  --color-border-subtle:  rgba(255,255,255,0.06);  /* 分割线、卡片边框 */
+  --color-border-default: rgba(255,255,255,0.12);  /* 交互元素边框 */
+  --color-border-strong:  rgba(255,255,255,0.24);  /* 聚焦输入框、激活态 */
+
+  /* ---- 文字 ---- */
+  --color-text-primary:   #F0F2F7;   /* 主要内容 */
+  --color-text-secondary: #8B92A5;   /* 标签、元数据 */
+  --color-text-tertiary:  #4E5568;   /* 占位符、禁用态 */
+  --color-text-inverse:   #0F1117;   /* 浅色/彩色背景上的文字 */
+
+  /* ---- 金融语义色 ---- */
+  --color-profit:         #00C896;   /* 盈利/买入/正向 */
+  --color-profit-dim:     rgba(0,200,150,0.12);
+  --color-profit-border:  rgba(0,200,150,0.30);
+
+  --color-loss:           #FF4D6A;   /* 亏损/卖出/负向 */
+  --color-loss-dim:       rgba(255,77,106,0.12);
+  --color-loss-border:    rgba(255,77,106,0.30);
+
+  --color-hold:           #F5A623;   /* 持有/警告/中性 */
+  --color-hold-dim:       rgba(245,166,35,0.12);
+  --color-hold-border:    rgba(245,166,35,0.30);
+
+  /* ---- 品牌强调色 ---- */
+  --color-accent:         #6C63FF;
+  --color-accent-dim:     rgba(108,99,255,0.15);
+  --color-accent-border:  rgba(108,99,255,0.35);
+  --color-accent-hover:   #8179FF;
+
+  /* ---- 数据可视化调色板（8色，禁用于金融语义场景） ---- */
+  --color-data-1: #6C63FF;
+  --color-data-2: #00C896;
+  --color-data-3: #F5A623;
+  --color-data-4: #FF6B9D;
+  --color-data-5: #4ECDC4;
+  --color-data-6: #A78BFA;
+  --color-data-7: #FCD34D;
+  --color-data-8: #6EE7B7;
+
+  /* ---- 字体 ---- */
+  --font-display: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono:    'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+
+  /* ---- 字号比例 ---- */
+  --text-2xs: 10px;
+  --text-xs:  11px;
+  --text-sm:  12px;
+  --text-base: 13px;
+  --text-md:  14px;
+  --text-lg:  16px;
+  --text-xl:  20px;
+  --text-2xl: 24px;
+  --text-3xl: 32px;
+
+  /* ---- 间距 ---- */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* ---- 圆角 ---- */
+  --radius-sm:   4px;
+  --radius-md:   6px;
+  --radius-lg:   10px;
+  --radius-xl:   14px;
+  --radius-full: 9999px;
+
+  /* ---- 过渡动效 ---- */
+  --transition-fast:   150ms ease;
+  --transition-base:   200ms ease;
+  --transition-slow:   350ms ease;
+  --ease-out:   cubic-bezier(0.0, 0, 0.2, 1);
+  --ease-in:    cubic-bezier(0.4, 0, 1, 1);
+  --ease-inout: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ---- 响应式断点（用于 JS 引用） ---- */
+  --bp-sm:  768px;
+  --bp-md:  1024px;
+  --bp-lg:  1280px;
+  --bp-xl:  1440px;
+  --bp-2xl: 1920px;
+}
+
+/* ---- 全局重置 ---- */
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  /* App 是固定视口外壳，所有滚动都在内层容器；禁止文档级溢出，
+     避免边缘浮层（Tooltip/Popover/Dropdown）瞬时溢出触发滚动条出现/消失的闪烁振荡。 */
+  overflow: hidden;
+  font-family: var(--font-display);
+  background: var(--color-bg-base);
+  color: var(--color-text-primary);
+  font-size: 13px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ---- Agent 状态脉冲动画 ---- */
+@keyframes agent-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.85); }
+}
+.agent-dot-active { animation: agent-pulse 2s ease-in-out infinite; }
+
+/* ---- 数据流进入动画 ---- */
+@keyframes stream-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.stream-item-new { animation: stream-in 250ms var(--ease-out); }
+
+/* ---- 置信度条增长动画 ---- */
+@keyframes bar-grow {
+  from { width: 0%; }
+}
+.confidence-bar-fill { animation: bar-grow 600ms var(--ease-out); }
+
+/* ---- 数值更新闪烁动画 ---- */
+@keyframes value-flash {
+  0%   { color: var(--color-text-primary); }
+  30%  { color: var(--color-accent); }
+  100% { color: var(--color-text-primary); }
+}
+.value-updated { animation: value-flash 800ms ease; }
+
+/* ---- 决策确认成功动画 ---- */
+@keyframes decision-confirm-fade {
+  0%   { opacity: 1; transform: scale(1); }
+  50%  { opacity: 0.8; transform: scale(1.02); }
+  100% { opacity: 0; transform: scale(0.96); height: 0; padding: 0; margin: 0; border: 0; overflow: hidden; }
+}
+
+/* ---- 决策忽略消失动画 ---- */
+@keyframes decision-dismiss-fade {
+  0%   { opacity: 1; }
+  100% { opacity: 0; transform: translateX(-20px); height: 0; padding: 0; margin: 0; border: 0; overflow: hidden; }
+}
+
+/* ---- 信号脉冲动画 ---- */
+@keyframes signal-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(108,99,255,0.4); }
+  50%      { box-shadow: 0 0 0 6px rgba(108,99,255,0); }
+}
+.signal-pulse-dot { animation: signal-pulse 2s ease-in-out infinite; }
+
+/* ---- 图表渐入动画 ---- */
+@keyframes chart-fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.chart-fade-in { animation: chart-fade-in 500ms var(--ease-out); }
+
+/* ---- 减少动效偏好 ---- */
+@media (prefers-reduced-motion: reduce) {
+  .agent-dot-active,
+  .stream-item-new,
+  .confidence-bar-fill,
+  .value-updated,
+  .signal-pulse-dot,
+  .chart-fade-in {
+    animation: none;
+  }
+}
+
+/* ---- 让 antd Tabs 内容区填满高度（Monaco 等需要确定高度的组件依赖此）---- */
+.fill-tabs {
+  display: flex;
+  flex-direction: column;
+}
+.fill-tabs > .ant-tabs-content-holder {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+.fill-tabs > .ant-tabs-content-holder > .ant-tabs-content {
+  height: 100%;
+}
+.fill-tabs .ant-tabs-tabpane {
+  height: 100%;
+}
+

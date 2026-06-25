@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# uv
+.uv/
+
+# 环境与密钥
+.env
+
+# 测试与缓存
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# 日志
+*.log
+logs/
+
+# 本地 SQLite 数据库（保留 data/.gitkeep）
+data/*.db
+data/*.db-journal
