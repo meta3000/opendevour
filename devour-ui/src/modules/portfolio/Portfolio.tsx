@@ -4,7 +4,7 @@
  * 增强：持仓导入/添加/编辑/删除 + 风险仪表盘动画 + 交易时间线视图 + 静默现价刷新
  */
 import { useState, useEffect, useCallback } from 'react';
-import { Button, Space, Divider, Tooltip, message } from 'antd';
+import { Button, Space, Tooltip, message } from 'antd';
 import { Upload, RefreshCw, Send, Briefcase, History } from 'lucide-react';
 import HoldingsTable from './HoldingsTable';
 import AnalysisPanel from './AnalysisPanel';
@@ -12,13 +12,16 @@ import { HoldingImportModal } from './HoldingImportModal';
 import { AddPositionModal } from './AddPositionModal';
 import { EditPositionModal } from './EditPositionModal';
 import { TradeTimeline } from './TradeTimeline';
-import { PortfolioSelector } from './PortfolioSelector';
+import { PortfolioTabs } from './PortfolioTabs';
 import { AnimatedMetricCard } from '../../components/AnimatedMetricCard';
 import type { Holding, RiskMetrics as RiskMetricsType } from '../../types/portfolio';
 import { getHoldings, getRiskMetrics, refreshPrices, deletePosition, sendPortfolioToCockpit } from '../../api/portfolio.api';
-import { mockRiskMetrics } from '../../mock/portfolio.mock';
 
-const defaultRisk = mockRiskMetrics;
+const emptyRisk: RiskMetricsType = {
+  sharpeRatio: 0, maxDrawdown: 0, volatility: 0, var95: 0,
+  beta: 0, informationRatio: 0, navValue: 0, todayReturn: 0,
+  ytdReturn: 0, alphaReturn: 0,
+};
 
 export default function Portfolio() {
   const [refreshing, setRefreshing] = useState(false);
@@ -30,7 +33,7 @@ export default function Portfolio() {
   const [kpiKey, setKpiKey] = useState(0); // 用于触发动画重播
   const [currentPortfolioId, setCurrentPortfolioId] = useState<number>(1); // 当前选中的组合ID
   const [holdings, setHoldings] = useState<Holding[]>([]);
-  const [risk, setRisk] = useState<RiskMetricsType>(defaultRisk);
+  const [risk, setRisk] = useState<RiskMetricsType>(emptyRisk);
   const [loading, setLoading] = useState(true);
 
   const fetchData = useCallback(async () => {
@@ -166,8 +169,6 @@ export default function Portfolio() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <Briefcase size={16} color="var(--color-accent-blue)" />
           <span style={{ fontSize: 15, fontWeight: 600, color: 'var(--color-text-primary)' }}>持仓管理</span>
-          <PortfolioSelector value={currentPortfolioId} onChange={setCurrentPortfolioId} />
-          <Divider type="vertical" style={{ borderColor: 'var(--color-border-subtle)', margin: '0 4px' }} />
           <span style={{ fontSize: 12, color: 'var(--color-text-tertiary)' }}>
             {holdings.length} 支持仓 · {loading ? '加载中...' : '已同步'}
           </span>
@@ -216,6 +217,9 @@ export default function Portfolio() {
           </Button>
         </Space>
       </div>
+
+      {/* 投资组合 Tab 栏 */}
+      <PortfolioTabs value={currentPortfolioId} onChange={setCurrentPortfolioId} />
 
       {/* KPI 概览条 — 带计数动画 */}
       <div

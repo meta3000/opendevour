@@ -68,6 +68,9 @@ class Settings(BaseSettings):
     # ---- 本地 SQLite 数据库 ----
     db_path: str = "./data/devour.db"
 
+    # ---- 会话文件存储 ----
+    session_files_dir: str = "./data/sessions"
+
     # ---- 派生属性 ----
     @computed_field  # type: ignore[prop-decorator]
     @property

@@ -26,7 +26,8 @@ class ChatStreamRequest(BaseModel):
     """
 
     message: str
-    sessionId: str | None = None
+    conversationId: str | None = None  # 会话 ID（优先使用）
+    sessionId: str | None = None       # 保留向后兼容
     context: list[ContextRef] | None = None
     enableThoughtChain: bool = True
     # 动态模型配置（可选）
@@ -51,6 +52,7 @@ class TokenData(BaseModel):
 
 class DoneData(BaseModel):
     sessionId: str
+    conversationId: str | None = None
     totalTokens: int | None = None
 
 

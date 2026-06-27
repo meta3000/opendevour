@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 
-from sqlalchemy import Column, DateTime, Float, ForeignKey, Integer, String, UniqueConstraint
+from sqlalchemy import Column, DateTime, Float, ForeignKey, Index, Integer, String
 from sqlalchemy.orm import relationship
 
 from ..db.base import Base
@@ -37,7 +37,7 @@ class Position(Base):
     __tablename__ = "positions"
     
     __table_args__ = (
-        UniqueConstraint('portfolio_id', 'symbol', name='uq_portfolio_symbol'),
+        Index('uq_portfolio_symbol', 'portfolio_id', 'symbol', unique=True),
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)

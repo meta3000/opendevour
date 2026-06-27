@@ -9,7 +9,7 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ...core.response import ApiResponse, ok
+from ...core.response import ApiResponse, fail, ok
 from ...db.session import get_db
 from ...schemas.portfolio import (
     ImportRequest,
@@ -85,7 +85,10 @@ async def update_portfolio(
 
 @router.delete("/{portfolio_id}", response_model=ApiResponse)
 async def delete_portfolio(portfolio_id: int, db: AsyncSession = _db_dep) -> ApiResponse:
-    """删除投资组合（级联删除所有持仓和交易记录）。"""
+    """删除投资组合（级联删除所有持仓和交易记录）。至少保留一个组合。"""
+    all_portfolios = await portfolio_service.list_portfolios(db)
+    if len(all_portfolios) <= 1:
+        return fail(code=400, message="至少保留一个投资组合")
     await portfolio_service.delete_portfolio(db, portfolio_id)
     await db.commit()
     return ok(message="组合已删除")

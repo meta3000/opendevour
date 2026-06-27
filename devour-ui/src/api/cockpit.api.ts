@@ -33,7 +33,9 @@ export interface ContextRef {
 export interface ChatStreamRequest {
   /** 用户输入的消息文本 */
   message: string;
-  /** 会话 ID，续接历史对话（首次为空，服务端返回后存储） */
+  /** 会话 ID（优先使用，续接历史对话） */
+  conversationId?: string;
+  /** 会话 ID，续接历史对话（保留向后兼容） */
   sessionId?: string;
   /** 当前工作台上下文引用（可选，辅助 Agent 理解背景） */
   context?: ContextRef[];
@@ -114,8 +116,10 @@ export interface RichContentData {
 
 /** 流结束标志 */
 export interface DoneData {
-  /** 会话 ID（服务端分配，首次对话时需保存到客户端） */
+  /** 会话 ID（服务端分配，首次对话时要保存到客户端） */
   sessionId: string;
+  /** 会话 ID（与 sessionId 相同，新字段） */
+  conversationId?: string;
   /** 本次 token 消耗量（可选，用于计费/监控） */
   totalTokens?: number;
 }

@@ -4,7 +4,6 @@
  * 后端契约：/api/v1/market/*
  * 将后端简单数据模型转换为前端组件期望的 richer 类型。
  * 保留原有接口类型声明；新增 fetch 函数负责真实网络请求与数据转换。
- * 可通过环境变量 VITE_USE_MOCK=true 强制回退到 Mock 数据。
  */
 
 import type {
@@ -14,16 +13,9 @@ import type {
   MarketSignal,
   SignalStrength,
 } from '../types/market';
-import {
-  mockHeatmapNodes,
-  mockSectorData,
-  mockCapitalFlow,
-  mockSignals,
-} from '../mock/market.mock';
 import type { ApiResponse, PaginatedData, PaginationRequest, TimeRange } from './types';
 
 const API_BASE = '/api/v1/market';
-const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true';
 
 /** 统一解包 ApiResponse。 */
 async function unwrap<T>(resp: Response): Promise<T> {
@@ -299,22 +291,11 @@ function toMarketSignal(s: SignalBackend, index: number): MarketSignal {
 }
 
 // ============================================================
-// 真实 API 调用（带 Mock fallback）
+// 真实 API 调用
 // ============================================================
 
 /** 获取市场热力图数据。 */
 export async function fetchHeatmap(req: GetHeatmapRequest = {}): Promise<HeatmapNode[]> {
-  if (USE_MOCK) {
-    let data = mockHeatmapNodes;
-    if (req.sector) {
-      data = data.filter((n) => n.sector === req.sector);
-    }
-    if (req.limit) {
-      data = data.slice(0, req.limit);
-    }
-    return data;
-  }
-
   const resp = await fetch(`${API_BASE}/heatmap${buildQuery({ date: req.date })}`);
   const data = await unwrap<HeatmapBackend>(resp);
   let nodes = data.sectors.map(toHeatmapNode);
@@ -329,8 +310,6 @@ export async function fetchHeatmap(req: GetHeatmapRequest = {}): Promise<Heatmap
 
 /** 获取板块轮动数据。 */
 export async function fetchSectorData(_req: GetSectorDataRequest = {}): Promise<SectorData[]> {
-  if (USE_MOCK) return mockSectorData;
-
   const resp = await fetch(`${API_BASE}/heatmap`);
   const data = await unwrap<HeatmapBackend>(resp);
   return data.sectors.map(toSectorData);
@@ -338,14 +317,6 @@ export async function fetchSectorData(_req: GetSectorDataRequest = {}): Promise<
 
 /** 获取板块资金流向数据。 */
 export async function fetchCapitalFlow(req: GetCapitalFlowRequest = {}): Promise<CapitalFlowItem[]> {
-  if (USE_MOCK) {
-    let data = mockCapitalFlow;
-    if (req.topN) {
-      data = data.slice(0, req.topN);
-    }
-    return data;
-  }
-
   const resp = await fetch(`${API_BASE}/heatmap`);
   const data = await unwrap<HeatmapBackend>(resp);
   let items = data.sectors.map(toCapitalFlowItem).sort((a, b) => b.netInflow - a.netInflow);
@@ -357,23 +328,6 @@ export async function fetchCapitalFlow(req: GetCapitalFlowRequest = {}): Promise
 
 /** 获取信号扫描列表。 */
 export async function fetchSignals(req: GetSignalsRequest = { page: 1, pageSize: 20 }): Promise<MarketSignal[]> {
-  if (USE_MOCK) {
-    let data = mockSignals;
-    if (req.direction) {
-      data = data.filter((s) => s.direction === req.direction);
-    }
-    if (req.type) {
-      data = data.filter((s) => s.type === req.type);
-    }
-    if (req.sector) {
-      data = data.filter((s) => s.sector === req.sector);
-    }
-    if (req.minConfidence) {
-      data = data.filter((s) => s.confidence >= req.minConfidence!);
-    }
-    return data;
-  }
-
   const signalType = req.direction === 'long' ? 'bullish' : req.direction === 'short' ? 'bearish' : undefined;
   const resp = await fetch(
     `${API_BASE}/signals${buildQuery({

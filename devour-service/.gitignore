@@ -5,9 +5,6 @@ __pycache__/
 .venv/
 venv/
 
-# uv
-.uv/
-
 # 环境与密钥
 .env
 

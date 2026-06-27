@@ -11,7 +11,6 @@
 
 from __future__ import annotations
 
-from langchain_core.messages import SystemMessage
 from langgraph.graph import END, START, MessagesState, StateGraph
 from langgraph.prebuilt import ToolNode, tools_condition
 
@@ -86,8 +85,12 @@ ALL_TOOLS = [
 ]
 
 
-def build_graph(llm_config: LLMConfig, system_prompt: str = SYSTEM_PROMPT):
-    """根据给定模型配置编译一个带 Tool Binding 的 ReAct 对话图。"""
+def build_graph(llm_config: LLMConfig):
+    """根据给定模型配置编译一个带 Tool Binding 的 ReAct 对话图。
+
+    注意：system prompt 已由调用方（ContextBuilder）包含在 messages 中，
+    assistant 节点不再自动插入 SystemMessage。
+    """
     model = build_chat_model(llm_config)
     # 将工具绑定到 LLM，使其能在推理时自主决定是否调用
     model_with_tools = model.bind_tools(ALL_TOOLS)
@@ -96,9 +99,10 @@ def build_graph(llm_config: LLMConfig, system_prompt: str = SYSTEM_PROMPT):
     tool_node = ToolNode(ALL_TOOLS)
 
     async def assistant(state: MessagesState) -> dict:
-        """Assistant 节点：调用绑定了 tools 的 LLM。"""
-        messages = [SystemMessage(content=system_prompt), *state["messages"]]
-        response = await model_with_tools.ainvoke(messages)
+        """Assistant 节点：调用绑定了 tools 的 LLM。
+        注意：system prompt 已由调用方（ContextBuilder）包含在 state messages 中。
+        """
+        response = await model_with_tools.ainvoke(state["messages"])
         return {"messages": [response]}
 
     # 构建状态图

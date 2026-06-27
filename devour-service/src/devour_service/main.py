@@ -16,6 +16,7 @@ from .core.exceptions import register_exception_handlers
 from .core.logging import get_logger
 from .db.base import Base
 from .db.engine import engine
+from .db.session import async_session
 from .models import portfolio  # noqa: F401 - 注册 ORM 表到 Base.metadata
 from .scheduler.manager import TaskConfig, scheduler_manager
 from .scheduler.tasks.portfolio_analysis import daily_portfolio_analysis
@@ -37,6 +38,16 @@ async def lifespan(app: FastAPI):
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     logger.info("数据库表已初始化: %s", settings.db_path)
+
+    # 确保默认投资组合存在
+    from .schemas.portfolio import PortfolioCreate
+    from .services.portfolio_service import portfolio_service as _portfolio_svc
+    async with async_session() as _db:
+        _portfolios = await _portfolio_svc.list_portfolios(_db)
+        if not _portfolios:
+            await _portfolio_svc.create_portfolio(_db, PortfolioCreate(name="默认组合", description=""))
+            await _db.commit()
+            logger.info("已创建默认投资组合")
 
     # 注册定时任务
     scheduler_manager.register_task(

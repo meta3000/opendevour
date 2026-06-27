@@ -52,6 +52,9 @@ def setup_logging() -> None:
     # langchain-openai 每次调用都会就「自定义 transport 关闭代理自动探测」打印 WARNING，
     # 这是我们刻意为之（trust_env=False），降噪以保持业务日志整洁。
     logging.getLogger("langchain_openai.chat_models._client_utils").setLevel(logging.ERROR)
+    # watchfiles 在 --reload 模式下会频繁打印 "change detected"，
+    # 将 data/ 和 logs/ 排除后仍可能有误触发，统一降噪
+    logging.getLogger("watchfiles").setLevel(logging.WARNING)
     _CONFIGURED = True
 
 

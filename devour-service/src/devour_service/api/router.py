@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from fastapi import APIRouter
 
-from .v1 import chat, decisions, health, market, portfolio, scheduler, skills, stocks
+from .v1 import chat, conversation, decisions, health, market, portfolio, scheduler, session_files, skills, stocks
 
 api_router = APIRouter(prefix="/api")
 api_router.include_router(health.router)
@@ -19,3 +19,7 @@ api_router.include_router(decisions.router, prefix="/v1")
 api_router.include_router(scheduler.router, prefix="/v1")
 # 股票基础信息模块
 api_router.include_router(stocks.router, prefix="/v1")
+# 会话管理模块
+api_router.include_router(conversation.router, prefix="/v1")
+# 会话文件管理模块
+api_router.include_router(session_files.router, prefix="/v1")
